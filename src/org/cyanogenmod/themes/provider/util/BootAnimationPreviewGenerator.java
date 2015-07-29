@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import org.cyanogenmod.themes.provider.R;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +33,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class BootAnimationPreviewGenerator {
-    public static final String SYSTEM_BOOT_ANI_PATH = "/system/media/bootanimation.zip";
+    public static final String EXODUS_BOOT_ANI_PATH = "/system/media/bootanimation.zip";
+    public static final String CM_BOOT_ANI_PATH = "/data/system/theme/bootanimation-cm.zip";
+    public static final String AOSP_BOOT_ANI_PATH = "/data/system/theme/bootanimation-aosp.zip";
     public static final String THEME_BOOT_ANI_PATH = "bootanimation/bootanimation.zip";
 
     private Context mContext;
@@ -46,8 +49,18 @@ public class BootAnimationPreviewGenerator {
         ZipInputStream zis;
         String previewName;
         if (ThemeConfig.SYSTEM_DEFAULT.equals(pkgName)) {
-            previewName = getPreviewFrameEntryName(new FileInputStream(SYSTEM_BOOT_ANI_PATH));
-            zis = new ZipInputStream(new FileInputStream(SYSTEM_BOOT_ANI_PATH));
+			File cmAnim = new File(CM_BOOT_ANI_PATH);
+			File aospAnim = new File(AOSP_BOOT_ANI_PATH);
+			if (aospAnim.exists()) {
+                previewName = getPreviewFrameEntryName(new FileInputStream(AOSP_BOOT_ANI_PATH));
+                zis = new ZipInputStream(new FileInputStream(AOSP_BOOT_ANI_PATH));
+			} else if (cmAnim.exists()) {
+                previewName = getPreviewFrameEntryName(new FileInputStream(CM_BOOT_ANI_PATH));
+                zis = new ZipInputStream(new FileInputStream(CM_BOOT_ANI_PATH));
+			} else {
+                previewName = getPreviewFrameEntryName(new FileInputStream(EXODUS_BOOT_ANI_PATH));
+                zis = new ZipInputStream(new FileInputStream(EXODUS_BOOT_ANI_PATH));
+			}
         } else {
             final Context themeCtx = mContext.createPackageContext(pkgName, 0);
             previewName = getPreviewFrameEntryName(themeCtx.getAssets().open(THEME_BOOT_ANI_PATH));
